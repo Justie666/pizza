@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { addItem, minusItem, removeItem } from '../redux/slices/cartSlice';
+import {
+  addItem,
+  CartItem,
+  minusItem,
+  removeItem
+} from '../redux/slices/cartSlice';
 
-const CartItem = ({ id, title, price, imageUrl, size, type, count }) => {
+type CartItemProps = {
+  id: string;
+  title: string;
+  price: number;
+  imageUrl: string;
+  size: number;
+  type: string;
+  count: number;
+};
+
+const CartItemBlock: FC<CartItemProps> = ({
+  id,
+  title,
+  price,
+  imageUrl,
+  size,
+  type,
+  count
+}) => {
   const dispatch = useDispatch();
-  const onClickPlus = () => dispatch(addItem({ id }));
-  const onClickMinus = () => dispatch(minusItem({ id }));
+  const onClickPlus = () => dispatch(addItem({ id } as CartItem));
+  const onClickMinus = () => dispatch(minusItem(id));
   const onClickRemoveItem = () => {
     if (window.confirm('Ты уверен, что хочешь удалить товар?')) {
-      dispatch(removeItem({ id }));
+      dispatch(removeItem(id));
     }
   };
 
@@ -95,4 +118,4 @@ const CartItem = ({ id, title, price, imageUrl, size, type, count }) => {
   );
 };
 
-export default CartItem;
+export default CartItemBlock;

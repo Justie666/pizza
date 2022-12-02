@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CartItem from '../components/CartItem';
 import { clearItems, selectCart } from '../redux/slices/cartSlice';
 import CartEmpty from '../components/CartEmpty';
 
-const Cart = () => {
+const Cart: FC = () => {
   const { totalPrice, items } = useSelector(selectCart);
   const dispatch = useDispatch();
   const onClickClearItems = () => {
@@ -13,7 +13,10 @@ const Cart = () => {
       dispatch(clearItems());
     }
   };
-  const totalCount = items.reduce((sum, current) => sum + current.count, 0);
+  const totalCount = items.reduce(
+    (sum: number, current: any) => sum + current.count,
+    0
+  );
 
   if (!totalPrice) {
     return <CartEmpty />;
@@ -97,7 +100,7 @@ const Cart = () => {
           </div>
         </div>
         <div className="content__items">
-          {items.map((item) => (
+          {items.map((item: any) => (
             <CartItem key={item.id} {...item} />
           ))}
         </div>

@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { FC } from 'react';
 import logoSvg from '../assets/img/pizza-logo.svg';
 import { Link, useLocation } from 'react-router-dom';
 import Search from './Search';
 import { useSelector } from 'react-redux';
 import { selectCart } from '../redux/slices/cartSlice';
 
-const Header = () => {
+type FIXME = any;
+
+const Header: FC = () => {
   const { totalPrice, items } = useSelector(selectCart);
   const location = useLocation();
 
@@ -58,7 +60,10 @@ const Header = () => {
                   />
                 </svg>
                 <span>
-                  {items.reduce((sum, current) => sum + current.count, 0)}
+                  {items.reduce(
+                    (sum: number, current: FIXME) => sum + current.count,
+                    0
+                  )}
                 </span>
               </Link>
             )}

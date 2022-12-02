@@ -1,30 +1,40 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectSort, setSort } from '../redux/slices/filterSlice';
+import { selectSort, setSort, SortPropertyEnum } from '../redux/slices/filterSlice';
 
-export const list = [
-  { name: 'популярности(У)', sortProperty: 'rating' },
-  { name: 'популярности(В)', sortProperty: '-rating' },
-  { name: 'цене(У)', sortProperty: 'price' },
-  { name: 'цене(В)', sortProperty: '-price' },
-  { name: 'алфавиту(У)', sortProperty: 'title' },
-  { name: 'алфавиту(В)', sortProperty: '-title' }
+type SortItem = {
+  name: string
+  sortProperty: SortPropertyEnum
+};
+
+type PopupClick = MouseEvent & {
+  path: Node[];
+};
+
+export const list: SortItem[] = [
+  { name: 'популярности(У)', sortProperty: SortPropertyEnum.RATING_DESC },
+  { name: 'популярности(В)', sortProperty: SortPropertyEnum.RATING_ASC },
+  { name: 'цене(У)', sortProperty: SortPropertyEnum.PRICE_DESC },
+  { name: 'цене(В)', sortProperty: SortPropertyEnum.PRICE_ASC },
+  { name: 'алфавиту(У)', sortProperty: SortPropertyEnum.TITLE_DESC },
+  { name: 'алфавиту(В)', sortProperty: SortPropertyEnum.TITLE_ASC}
 ];
 
-const Sort = () => {
+const SortPopup: FC = () => {
   const dispatch = useDispatch();
   const sort = useSelector(selectSort);
-  const sortRef = useRef();
+  const sortRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
 
-  const onClickListItem = (obj) => {
+  const onClickListItem = (obj: SortItem): any => {
     dispatch(setSort(obj));
     setOpen(false);
   };
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.path.includes(sortRef.current)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      const _e = e as MouseEvent & PopupClick;
+      if (sortRef.current && !_e.path.includes(sortRef.current)) {
         setOpen(false);
       }
     };
@@ -73,4 +83,4 @@ const Sort = () => {
   );
 };
 
-export default Sort;
+export default SortPopup;
