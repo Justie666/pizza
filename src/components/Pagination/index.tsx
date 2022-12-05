@@ -6,19 +6,19 @@ type PaginationProps = {
   currentPage: number;
   onChangePage: (page: number) => void;
 };
-const Pagination: FC<PaginationProps> = ({ currentPage, onChangePage }) => {
+const Pagination: FC<PaginationProps> = React.memo(({ currentPage, onChangePage }) => {
   return (
     <ReactPaginate
       className={styles.root}
-      breakLabel="..."
-      nextLabel=">"
+      breakLabel='...'
+      nextLabel='>'
       onPageChange={(e) => onChangePage(e.selected + 1)}
       pageRangeDisplayed={4}
       pageCount={3}
       forcePage={currentPage - 1}
-      previousLabel="<"
+      previousLabel='<'
     />
   );
-};
+});
 
 export default Pagination;

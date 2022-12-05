@@ -1,25 +1,18 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useRef } from 'react';
 import Categories from '../components/Categories';
 import SortPopup, { list } from '../components/SortPopup';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import PizzaBlock from '../components/PizzaBlock/PizzaBlock';
 import Pagination from '../components/Pagination';
 import { useSelector } from 'react-redux';
-import {
-  selectFilter,
-  setCategoryId,
-  setCurrentPage,
-  setFilters
-} from '../redux/slices/filterSlice';
+import { setCategoryId, setCurrentPage, setFilters } from '../redux/filter/slice';
 import { useNavigate } from 'react-router-dom';
 import qs from 'qs';
-import {
-  fetchPizzas,
-  SearchPizzaParams,
-  selectPizzaData
-} from '../redux/slices/pizzaSlice';
 import { useAppDispatch } from '../redux/store';
-import { log } from 'util';
+import { selectFilter } from '../redux/filter/selectors';
+import { selectPizzaData } from '../redux/pizza/selectors';
+import { SearchPizzaParams } from '../redux/pizza/types';
+import { fetchPizzas } from '../redux/pizza/asyncActions';
 
 const Home: FC = () => {
   const searchValue = useSelector((state: any) => state.filter.searchValue);
@@ -30,13 +23,15 @@ const Home: FC = () => {
   const isMounted = useRef(false);
   const { categoryId, sort, currentPage } = useSelector(selectFilter);
 
-  const onChangeCategory = (id: number) => {
-    dispatch(setCategoryId(id));
-  };
+  useCallback(() => {}, []);
 
-  const onChangePage = (page: number) => {
+  const onChangeCategory = useCallback((id: number) => {
+    dispatch(setCategoryId(id));
+  }, []);
+
+  const onChangePage = useCallback((page: number) => {
     dispatch(setCurrentPage(page));
-  };
+  }, []);
 
   const getPizzas = async () => {
     const sortBy = sortType.replace('-', '');
@@ -50,8 +45,8 @@ const Home: FC = () => {
         currentPage: currentPage + '',
         order,
         search,
-        sortBy
-      })
+        sortBy,
+      }),
     );
 
     window.scrollTo(0, 0);
@@ -61,17 +56,15 @@ const Home: FC = () => {
 
   useEffect(() => {
     if (window.location.search) {
-      const params = qs.parse(
-        window.location.search.substring(1)
-      ) as unknown as SearchPizzaParams;
+      const params = qs.parse(window.location.search.substring(1)) as unknown as SearchPizzaParams;
       const sort = list.find((obj) => obj.sortProperty === params.sortBy);
       dispatch(
         setFilters({
           searchValue: params.search,
           categoryId: +params.category,
           currentPage: +params.currentPage,
-          sort: sort || list[0]
-        })
+          sort: sort || list[0],
+        }),
       );
       isSearch.current = true;
     }
@@ -82,7 +75,7 @@ const Home: FC = () => {
       const queryString = qs.stringify({
         sortProperty: sort.sortProperty,
         categoryId: categoryId > 0 ? categoryId : null,
-        currentPage
+        currentPage,
       });
       navigate(`?${queryString}`);
     }
@@ -97,28 +90,23 @@ const Home: FC = () => {
   }, [categoryId, sortType, searchValue, currentPage]);
 
   const pizzas = items.map((obj: any) => <PizzaBlock {...obj} key={obj.id} />);
-  const skeletons = [...new Array(4)].map((_, index) => (
-    <Skeleton key={index} />
-  ));
+  const skeletons = [...new Array(4)].map((_, index) => <Skeleton key={index} />);
   return (
-    <div className="container">
-      <div className="content__top">
+    <div className='container'>
+      <div className='content__top'>
         <Categories value={categoryId ? categoryId : 0} onChangeCategory={onChangeCategory} />
-        <SortPopup />
+        <SortPopup sort={sort} />
       </div>
-      <h2 className="content__title">Все пиццы</h2>
+      <h2 className='content__title'>Все пиццы</h2>
       {status === 'error' ? (
-        <div className="content__error-info">
+        <div className='content__error-info'>
           <h2>Произошла ошибка 😕</h2>
           <p>
-            К сожалению, не удалось получить пиццы :( <br /> Попробуйте
-            повторить поптку позже
+            К сожалению, не удалось получить пиццы :( <br /> Попробуйте повторить поптку позже
           </p>
         </div>
       ) : (
-        <div className="content__items">
-          {status === 'loading' ? skeletons : pizzas}
-        </div>
+        <div className='content__items'>{status === 'loading' ? skeletons : pizzas}</div>
       )}
       <Pagination currentPage={currentPage} onChangePage={onChangePage} />
     </div>
